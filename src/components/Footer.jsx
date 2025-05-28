@@ -80,6 +80,11 @@ function Footer() {
                   Home
                 </Link>
               </li>
+              <li>
+                <Link to="/listings" className="text-gray-400 hover:text-gold">
+                  Listings
+                </Link>
+              </li>
               {/* {userIsAdmin && (
                 <li>
                   <Link to="/browse" className="text-gray-400 hover:text-gold">
@@ -116,11 +121,23 @@ function Footer() {
                 </>
               )}
               {userIsAdmin && (
-                <li>
-                  <Link to="/admin" className="text-gray-400 hover:text-gold">
-                    Admin Dashboard
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link to="/admin/dashboard" className="text-gray-400 hover:text-gold">
+                      Admin Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/manage" className="text-gray-400 hover:text-gold">
+                      My Listings
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/inquiries" className="text-gray-400 hover:text-gold">
+                      Inquiries
+                    </Link>
+                  </li>
+                </>
               )}
               <li>
                 <Link to="/about" className="text-gray-400 hover:text-gold">

@@ -28,6 +28,12 @@ import FAQ from "./pages/FAQ";
 import ThemeProvider from "./context/ThemeProvider";
 import { useEffect, useState } from "react";
 
+// Gold Listings Feature imports
+import Listings from "./pages/Listings";
+import ListingDetail from "./pages/ListingDetail";
+import ManageListings from "./pages/admin/ManageListings";
+import ListingInquiries from "./pages/admin/ListingInquiries";
+
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -71,6 +77,10 @@ function App() {
                   <Route path="/terms" element={<Terms />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/faq" element={<FAQ />} />
+                  
+                  {/* Gold Listings Public Routes */}
+                  <Route path="/listings" element={<Listings />} />
+                  <Route path="/listing/:id" element={<ListingDetail />} />
 
                   {/* Admin Only Routes */}
                   <Route
@@ -86,6 +96,22 @@ function App() {
                     element={
                       <AdminRoute>
                         <AdminDashboard />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/manage"
+                    element={
+                      <AdminRoute>
+                        <ManageListings />
+                      </AdminRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/inquiries"
+                    element={
+                      <AdminRoute>
+                        <ListingInquiries />
                       </AdminRoute>
                     }
                   />

@@ -62,6 +62,12 @@ function Navbar() {
               >
                 Home
               </Link>
+              <Link
+                to="/listings"
+                className="text-gray-300 hover:text-gold px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Listings
+              </Link>
               {!user && (
                 <>
                   <Link
@@ -103,12 +109,26 @@ function Navbar() {
                     </>
                   )}
                   {userIsAdmin ? (
-                    <Link
-                      to="/admin"
-                      className="text-gray-300 hover:text-gold px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Admin Dashboard
-                    </Link>
+                    <>
+                      <Link
+                        to="/admin/dashboard"
+                        className="text-gray-300 hover:text-gold px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        Admin Dashboard
+                      </Link>
+                      <Link
+                        to="/admin/manage"
+                        className="text-gray-300 hover:text-gold px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        My Listings
+                      </Link>
+                      <Link
+                        to="/admin/inquiries"
+                        className="text-gray-300 hover:text-gold px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        Inquiries
+                      </Link>
+                    </>
                   ) : (
                     <Link
                       to="/my-items"
@@ -209,6 +229,13 @@ function Navbar() {
             >
               Home
             </Link>
+            <Link
+              to="/listings"
+              className="mobile-nav-link text-gray-300 text-lg font-medium"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Listings
+            </Link>
             {!user && (
               <>
                 <Link
@@ -255,13 +282,29 @@ function Navbar() {
                   </>
                 )}
                 {userIsAdmin ? (
-                  <Link
-                    to="/admin"
-                    className="mobile-nav-link text-gray-300 text-lg font-medium"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Admin Dashboard
-                  </Link>
+                  <>
+                    <Link
+                      to="/admin/dashboard"
+                      className="mobile-nav-link text-gray-300 text-lg font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                    <Link
+                      to="/admin/manage"
+                      className="mobile-nav-link text-gray-300 text-lg font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      My Listings
+                    </Link>
+                    <Link
+                      to="/admin/inquiries"
+                      className="mobile-nav-link text-gray-300 text-lg font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Inquiries
+                    </Link>
+                  </>
                 ) : (
                   <Link
                     to="/my-items"
