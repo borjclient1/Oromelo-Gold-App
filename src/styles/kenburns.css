@@ -1,0 +1,18 @@
+@keyframes kenBurns {
+  0% {
+    transform-origin: center;
+    transform: scale(1);
+  }
+  50% {
+    transform-origin: center;
+    transform: scale(1.25);
+  }
+  100% {
+    transform-origin: center;
+    transform: scale(1);
+  }
+}
+
+.ken-burns-element {
+  animation: kenBurns 15s infinite ease-in-out;
+}

@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Gold shimmer effect */
+@keyframes gold-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.gold-shimmer {
+  position: relative;
+  display: inline-block;
+  color: #BB902F;
+  background: linear-gradient(
+    90deg, 
+    #BB902F 0%, 
+    #FFD700 15%, 
+    #FFF7AD 30%, 
+    #FFD700 45%, 
+    #BB902F 60%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-shimmer 5s linear infinite;
+  text-shadow: 0 0 2px rgba(0,0,0,0.1);
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gold text-black font-semibold py-2 px-4 rounded shadow-md hover:bg-darkgold transition-all duration-300;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-900 text-gold   font-semibold py-2 px-4 rounded shadow-md hover:bg-gray-800 transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-amber-400;
+  }
+}

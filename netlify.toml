@@ -1,0 +1,38 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["resend"]
+  included_files = ["netlify/functions/send-email.js"]
+  
+  [functions.ignore]
+  external_node_modules = [".eslintrc.js"]
+
+[functions.runtime_settings]
+  node_version = "18"
+
+# Redirect all routes to index.html for React Router to handle them
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Special rule for auth callback path
+[[redirects]]
+  from = "/auth/callback"
+  to = "/index.html"
+  status = 200
+  force = true
+
+# Optional: Add security headers (good practice)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; img-src * data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://open.er-api.com;"

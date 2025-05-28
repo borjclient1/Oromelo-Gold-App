@@ -1,0 +1,100 @@
+/* Navbar responsiveness */
+@media (max-width: 1060px) {
+  .navbar-desktop {
+    display: none !important;
+  }
+  
+  .navbar-mobile-toggle {
+    display: flex !important;
+  }
+  
+  .navbar-mobile-menu {
+    display: block !important;
+    width: 100%;
+    animation: slideDown 0.3s ease-in-out;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    background-color: #121212;
+  }
+  
+  /* Mobile menu styling */
+  .mobile-nav-link {
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    margin: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #f3f4f6;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .mobile-nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #DAA520, transparent);
+    transition: width 0.3s ease;
+  }
+  
+  .mobile-nav-link:hover::after,
+  .mobile-nav-link:focus::after {
+    width: 70%;
+  }
+  
+  .mobile-nav-link:hover, 
+  .mobile-nav-link:focus {
+    background-color: rgba(218, 165, 32, 0.1);
+    color: #DAA520 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .mobile-nav-section {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(218, 165, 32, 0.2);
+  }
+  
+  /* Gold shimmer effect for mobile buttons */
+  .mobile-btn-gold {
+    background: linear-gradient(45deg, #b88c30, #DAA520, #ffd700, #DAA520);
+    background-size: 200% 200%;
+    animation: shimmer 3s infinite;
+    color: #121212;
+    font-weight: 600;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (min-width: 1061px) {
+  .navbar-desktop {
+    display: flex !important;
+  }
+  
+  .navbar-mobile-toggle,
+  .navbar-mobile-menu {
+    display: none !important;
+  }
+}

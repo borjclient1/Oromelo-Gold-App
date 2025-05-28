@@ -1,0 +1,13 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify serverless functions for Oromelo Gold Pawn",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "resend": "^4.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
