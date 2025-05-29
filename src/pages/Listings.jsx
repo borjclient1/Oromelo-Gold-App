@@ -145,61 +145,72 @@ const Listings = () => {
       className={`min-h-screen ${darkMode ? "bg-dark-surface-1 text-white" : "bg-white text-gray-900"}`}
     >
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Gold Listings</h1>
-          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 py-2 rounded text-sm flex items-center ${
-                darkMode
+        {/* Header */}
+        <div className="px-4 py-6 sm:px-0">
+          <h1 className={`text-3xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+            Gold Listings
+          </h1>
+          <p className={`mt-1 ${darkMode ? "text-gray-300" : "text-gray-500"}`}>
+            Browse our collection of gold items
+          </p>
+        </div>
+
+        {/* Filtering and sorting controls */}
+        <div className="px-4 sm:px-0 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-4 py-2 rounded text-sm flex items-center ${darkMode
                   ? "bg-gray-700 hover:bg-gray-600 text-white"
                   : "bg-white hover:bg-gray-100 text-gray-800 border border-gray-300"
-              }`}
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+                  }`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-                />
-              </svg>
-              {showFilters ? "Hide Filters" : "Show Filters"}
-            </button>
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                  />
+                </svg>
+                {showFilters ? "Hide Filters" : "Show Filters"}
+              </button>
+            </div>
 
-            <select
-              value={sortBy}
-              onChange={handleSortChange}
-              className={`px-3 py-2 rounded text-sm ${
-                darkMode
+            <div className={`w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 ${showFilters ? "mb-4" : ""}`}>
+              <select
+                value={sortBy}
+                onChange={handleSortChange}
+                className={`px-3 py-2 rounded text-sm ${darkMode
                   ? "bg-gray-700 text-white border-gray-600"
                   : "bg-white text-gray-800 border-gray-300"
-              } border`}
-            >
-              <option value="created_at">Date Added</option>
-              <option value="price">Price</option>
-              <option value="weight">Weight</option>
-              <option value="title">Title</option>
-            </select>
+                  } border`}
+              >
+                <option value="created_at">Date Added</option>
+                <option value="price">Price</option>
+                <option value="weight">Weight</option>
+                <option value="title">Title</option>
+              </select>
 
-            <select
-              value={sortOrder}
-              onChange={handleSortOrderChange}
-              className={`px-3 py-2 rounded text-sm ${
-                darkMode
+              <select
+                value={sortOrder}
+                onChange={handleSortOrderChange}
+                className={`px-3 py-2 rounded text-sm ${darkMode
                   ? "bg-gray-700 text-white border-gray-600"
                   : "bg-white text-gray-800 border-gray-300"
-              } border`}
-            >
-              <option value="desc">Descending</option>
-              <option value="asc">Ascending</option>
-            </select>
+                  } border`}
+              >
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+            </div>
           </div>
         </div>
 

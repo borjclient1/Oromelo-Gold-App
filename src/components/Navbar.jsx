@@ -47,7 +47,7 @@ function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 inset-x-0 z-50 ${darkMode ? 'bg-dark-surface-1 text-white' : 'bg-gray-900 text-white'} shadow-md transition-all duration-200 ${
+      className={`fixed top-0 inset-x-0 z-50 ${darkMode ? "bg-dark-surface-1 text-white" : "bg-gray-900 text-white"} shadow-md transition-all duration-200 ${
         scrolled ? "shadow-lg" : ""
       }`}
     >
@@ -111,7 +111,7 @@ function Navbar() {
                   {userIsAdmin ? (
                     <>
                       <Link
-                        to="/admin/dashboard"
+                        to="/admin"
                         className="text-gray-300 hover:text-gold px-3 py-2 rounded-md text-sm font-medium"
                       >
                         Admin Dashboard
@@ -284,7 +284,7 @@ function Navbar() {
                 {userIsAdmin ? (
                   <>
                     <Link
-                      to="/admin/dashboard"
+                      to="/admin"
                       className="mobile-nav-link text-gray-300 text-lg font-medium"
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -344,7 +344,10 @@ function Navbar() {
                     Hello, {user.user_metadata?.name || user.email}
                   </span>
                 </div>
-                <button onClick={handleSignOut} className="mobile-btn-gold w-full max-w-xs py-2 rounded-md">
+                <button
+                  onClick={handleSignOut}
+                  className="mobile-btn-gold w-full max-w-xs py-2 rounded-md"
+                >
                   Sign Out
                 </button>
               </div>

@@ -123,17 +123,23 @@ function Footer() {
               {userIsAdmin && (
                 <>
                   <li>
-                    <Link to="/admin/dashboard" className="text-gray-400 hover:text-gold">
+                    <Link to="/admin" className="text-gray-400 hover:text-gold">
                       Admin Dashboard
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/manage" className="text-gray-400 hover:text-gold">
+                    <Link
+                      to="/admin/manage"
+                      className="text-gray-400 hover:text-gold"
+                    >
                       My Listings
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/inquiries" className="text-gray-400 hover:text-gold">
+                    <Link
+                      to="/admin/inquiries"
+                      className="text-gray-400 hover:text-gold"
+                    >
                       Inquiries
                     </Link>
                   </li>

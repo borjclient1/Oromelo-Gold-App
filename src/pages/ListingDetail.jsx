@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
+import { ADMIN_EMAILS } from "../config/constants";
 import {
   getListingById,
   getLikesForListing,
   toggleLike,
   getCommentsForListing,
   addComment,
+  updateComment,
+  deleteComment,
   sendInquiry,
 } from "../services/listings-service";
 
@@ -35,6 +38,10 @@ const ListingDetail = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editCommentText, setEditCommentText] = useState("");
+  const [isUpdatingComment, setIsUpdatingComment] = useState(false);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
 
   const [inquiry, setInquiry] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -128,6 +135,54 @@ const ListingDetail = () => {
       console.error("Error adding comment:", err);
     } finally {
       setCommentLoading(false);
+    }
+  };
+
+  const handleEditComment = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditCommentText(comment.comment);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditCommentText("");
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    if (!editCommentText.trim()) return;
+
+    setIsUpdatingComment(true);
+    try {
+      const { error } = await updateComment(commentId, editCommentText);
+      if (error) throw error;
+
+      // Refresh comments
+      const { data: commentsData } = await getCommentsForListing(id);
+      setComments(commentsData || []);
+      setEditingCommentId(null);
+      setEditCommentText("");
+    } catch (err) {
+      console.error("Error updating comment:", err);
+    } finally {
+      setIsUpdatingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    
+    setIsDeletingComment(true);
+    try {
+      const { error } = await deleteComment(commentId);
+      if (error) throw error;
+
+      // Refresh comments
+      const { data: commentsData } = await getCommentsForListing(id);
+      setComments(commentsData || []);
+    } catch (err) {
+      console.error("Error deleting comment:", err);
+    } finally {
+      setIsDeletingComment(false);
     }
   };
 
@@ -433,31 +488,90 @@ const ListingDetail = () => {
               <div className="space-y-4">
                 {comments.map((comment) => (
                   <div key={comment.id} className={`border-b pb-4 ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                    <div className="flex items-center mb-2">
-                      <div className={`w-10 h-10 rounded-full mr-3 overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-                        {comment.profiles?.avatar_url ? (
-                          <img
-                            src={comment.profiles.avatar_url}
-                            alt={comment.profiles.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className={`flex flex-col md:flex-row md:items-center text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            {comment.profiles?.name?.charAt(0).toUpperCase() ||
-                              "U"}
-                          </div>
-                        )}
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center">
+                        <div className={`w-10 h-10 rounded-full mr-3 overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                          {comment.profiles?.avatar_url ? (
+                            <img
+                              src={comment.profiles.avatar_url}
+                              alt={comment.profiles.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className={`w-10 h-10 flex items-center justify-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {comment.profiles?.name?.charAt(0).toUpperCase() ||
+                                "U"}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">
+                            {comment.profiles?.name || "User"}
+                          </p>
+                          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {new Date(comment.created_at).toLocaleDateString()}
+                            {comment.updated_at && comment.updated_at !== comment.created_at && 
+                              " (edited)"}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">
-                          {comment.profiles?.name || "User"}
-                        </p>
-                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {new Date(comment.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
+                      
+                      {/* Comment actions - only show for the comment owner or admin */}
+                      {(user && (user.id === comment.user_id || user.email && ADMIN_EMAILS?.includes(user.email))) && (
+                        <div className="flex space-x-2">
+                          {user.id === comment.user_id && (
+                            <button 
+                              onClick={() => handleEditComment(comment)}
+                              className={`p-1 rounded-full hover:bg-opacity-20 ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
+                              aria-label="Edit comment"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className={`p-1 rounded-full hover:bg-opacity-20 ${darkMode ? 'hover:bg-gray-700 text-red-400 hover:text-red-300' : 'hover:bg-gray-200 text-red-600 hover:text-red-700'}`}
+                            aria-label="Delete comment"
+                            disabled={isDeletingComment}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <p className={`mt-6 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{comment.comment}</p>
+
+                    {editingCommentId === comment.id ? (
+                      <div className="mt-2">
+                        <textarea
+                          value={editCommentText}
+                          onChange={(e) => setEditCommentText(e.target.value)}
+                          className={`w-full p-3 border rounded-lg ${darkMode ? 'bg-dark-surface-1 border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                          rows="2"
+                          required
+                        ></textarea>
+                        <div className="flex space-x-2 mt-2">
+                          <button
+                            onClick={() => handleUpdateComment(comment.id)}
+                            disabled={isUpdatingComment}
+                            className="bg-amber-600 text-white py-1 px-3 rounded font-medium hover:bg-amber-700 transition-colors text-sm"
+                          >
+                            {isUpdatingComment ? "Updating..." : "Update"}
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className={`py-1 px-3 rounded font-medium text-sm ${darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className={`mt-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{comment.comment}</p>
+                    )}
                   </div>
                 ))}
               </div>

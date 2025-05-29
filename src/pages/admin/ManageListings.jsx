@@ -249,7 +249,7 @@ const ManageListings = () => {
       className={`min-h-screen ${darkMode ? "bg-dark-surface-1 text-white" : "bg-white text-gray-900"}`}
     >
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-4 sm:px-0">
           <h1 className="text-2xl font-bold">Manage Gold Listings</h1>
           <button
             onClick={() => {
@@ -257,7 +257,7 @@ const ManageListings = () => {
               setIsEditing(false);
               resetForm();
             }}
-            className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700"
+            className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 whitespace-nowrap"
           >
             Add New Listing
           </button>
@@ -266,7 +266,7 @@ const ManageListings = () => {
         {/* Add/Edit Form */}
         {formOpen && (
           <div
-            className={`p-6 rounded-lg shadow-md mb-8 ${darkMode ? "bg-dark-surface-2" : "bg-white"}`}
+            className={`p-4 sm:p-6 rounded-lg shadow-md mb-8 mx-4 sm:mx-0 ${darkMode ? "bg-dark-surface-2" : "bg-white"}`}
           >
             <h2 className="text-xl font-semibold mb-4">
               {isEditing ? "Edit Listing" : "Add New Listing"}
@@ -516,7 +516,7 @@ const ManageListings = () => {
           </div>
         )}
 
-        {/* Listings Table */}
+        {/* Listings Section */}
         {loading ? (
           <div className="flex justify-center items-center h-32">
             <div
@@ -524,98 +524,192 @@ const ManageListings = () => {
             ></div>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table
-              className={`min-w-full rounded-lg overflow-hidden shadow ${darkMode ? "bg-dark-surface-2" : "bg-white"}`}
-            >
-              <thead className={darkMode ? "bg-gray-800" : "bg-gray-100"}>
-                <tr>
-                  <th className="py-3 px-4 text-left">Image</th>
-                  <th className="py-3 px-4 text-left">Title</th>
-                  <th className="py-3 px-4 text-left">Category</th>
-                  <th className="py-3 px-4 text-left">Price</th>
-                  <th className="py-3 px-4 text-left">Status</th>
-                  <th className="py-3 px-4 text-left">Created</th>
-                  <th className="py-3 px-4 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {listings.length === 0 ? (
+          <div className="px-4 sm:px-0">
+            {/* Desktop Table View (hidden on mobile) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table
+                className={`min-w-full rounded-lg overflow-hidden shadow ${darkMode ? "bg-dark-surface-2" : "bg-white"}`}
+              >
+                <thead className={darkMode ? "bg-gray-800" : "bg-gray-100"}>
                   <tr>
-                    <td
-                      colSpan="7"
-                      className={`py-4 px-4 text-center ${darkMode ? "text-gray-400" : "text-gray-500"}`}
-                    >
-                      No listings found. Create your first listing!
-                    </td>
+                    <th className="py-3 px-4 text-left">Image</th>
+                    <th className="py-3 px-4 text-left">Title</th>
+                    <th className="py-3 px-4 text-left">Category</th>
+                    <th className="py-3 px-4 text-left">Price</th>
+                    <th className="py-3 px-4 text-left">Status</th>
+                    <th className="py-3 px-4 text-left">Created</th>
+                    <th className="py-3 px-4 text-left">Actions</th>
                   </tr>
-                ) : (
-                  listings.map((listing) => (
-                    <tr
-                      key={listing.id}
-                      className={`border-t ${darkMode ? "hover:bg-gray-800 border-gray-700" : "hover:bg-gray-50 border-gray-200"}`}
-                    >
-                      <td className="py-3 px-4">
-                        {listing.image_url ? (
-                          <img
-                            src={listing.image_url}
-                            alt={listing.title}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                        ) : (
-                          <div
-                            className={`w-16 h-16 rounded flex items-center justify-center ${darkMode ? "bg-gray-700" : "bg-gray-200"}`}
-                          >
-                            <span
-                              className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}
-                            >
-                              No image
-                            </span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 font-medium">{listing.title}</td>
-                      <td className="py-3 px-4">{listing.category}</td>
-                      <td className="py-3 px-4">
-                        ₱{listing.price?.toLocaleString() || "0"}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${
-                            listing.status === "active"
-                              ? "bg-green-100 text-green-800"
-                              : listing.status === "inactive"
-                                ? "bg-gray-100 text-gray-800"
-                                : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {listing.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {new Date(listing.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEditClick(listing)}
-                            className={`${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-800"}`}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(listing.id)}
-                            className={`${darkMode ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-800"}`}
-                          >
-                            Delete
-                          </button>
-                        </div>
+                </thead>
+                <tbody>
+                  {listings.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className={`py-4 px-4 text-center ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                      >
+                        No listings found. Create your first listing!
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    listings.map((listing) => (
+                      <tr
+                        key={listing.id}
+                        className={`border-t ${darkMode ? "hover:bg-gray-800 border-gray-700" : "hover:bg-gray-50 border-gray-200"}`}
+                      >
+                        <td className="py-3 px-4">
+                          {listing.image_url ? (
+                            <img
+                              src={listing.image_url}
+                              alt={listing.title}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          ) : (
+                            <div
+                              className={`w-16 h-16 rounded flex items-center justify-center ${darkMode ? "bg-gray-700" : "bg-gray-200"}`}
+                            >
+                              <span
+                                className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                              >
+                                No image
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 font-medium">{listing.title}</td>
+                        <td className="py-3 px-4">{listing.category}</td>
+                        <td className="py-3 px-4">
+                          ₱{listing.price?.toLocaleString() || "0"}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              listing.status === "active"
+                                ? "bg-green-100 text-green-800"
+                                : listing.status === "inactive"
+                                  ? "bg-gray-100 text-gray-800"
+                                  : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {listing.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          {new Date(listing.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEditClick(listing)}
+                              className={`${darkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-800"}`}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(listing.id)}
+                              className={`${darkMode ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-800"}`}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Mobile Card View (shown only on mobile) */}
+            <div className="md:hidden">
+              {listings.length === 0 ? (
+                <div className={`p-4 text-center rounded-lg shadow ${darkMode ? "bg-dark-surface-2 text-gray-400" : "bg-white text-gray-500"}`}>
+                  No listings found. Create your first listing!
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {listings.map((listing) => (
+                    <div 
+                      key={listing.id}
+                      className={`rounded-lg shadow overflow-hidden ${darkMode ? "bg-dark-surface-2" : "bg-white"}`}
+                    >
+                      <div className="flex items-start p-4">
+                        <div className="mr-4">
+                          {listing.image_url ? (
+                            <img
+                              src={listing.image_url}
+                              alt={listing.title}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          ) : (
+                            <div
+                              className={`w-16 h-16 rounded flex items-center justify-center ${darkMode ? "bg-gray-700" : "bg-gray-200"}`}
+                            >
+                              <span
+                                className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}
+                              >
+                                No image
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-lg mb-1 truncate">{listing.title}</h3>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                            <div>
+                              <span className={darkMode ? "text-gray-400" : "text-gray-500"}>Category: </span>
+                              {listing.category}
+                            </div>
+                            <div>
+                              <span className={darkMode ? "text-gray-400" : "text-gray-500"}>Price: </span>
+                              ₱{listing.price?.toLocaleString() || "0"}
+                            </div>
+                            <div>
+                              <span className={darkMode ? "text-gray-400" : "text-gray-500"}>Status: </span>
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                  listing.status === "active"
+                                    ? "bg-green-100 text-green-800"
+                                    : listing.status === "inactive"
+                                      ? "bg-gray-100 text-gray-800"
+                                      : "bg-blue-100 text-blue-800"
+                                }`}
+                              >
+                                {listing.status}
+                              </span>
+                            </div>
+                            <div>
+                              <span className={darkMode ? "text-gray-400" : "text-gray-500"}>Created: </span>
+                              {new Date(listing.created_at).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className={`flex justify-end px-4 py-3 gap-3 border-t ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
+                        <button
+                          onClick={() => handleEditClick(listing)}
+                          className={`px-3 py-1 text-sm rounded ${darkMode 
+                            ? "bg-blue-900/30 text-blue-300 hover:bg-blue-900/50" 
+                            : "bg-blue-50 text-blue-700 hover:bg-blue-100"}`}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(listing.id)}
+                          className={`px-3 py-1 text-sm rounded ${darkMode 
+                            ? "bg-red-900/30 text-red-300 hover:bg-red-900/50" 
+                            : "bg-red-50 text-red-700 hover:bg-red-100"}`}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

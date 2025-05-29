@@ -218,6 +218,13 @@ export const addComment = async (listingId, userId, comment) => {
     });
 };
 
+export const updateComment = async (commentId, comment) => {
+  return supabase
+    .from('listing_comments')
+    .update({ comment, updated_at: new Date().toISOString() })
+    .eq('id', commentId);
+};
+
 export const deleteComment = async (commentId) => {
   return supabase
     .from('listing_comments')
@@ -260,8 +267,25 @@ export const getUserInquiries = async (userId) => {
 };
 
 export const markInquiryAsRead = async (inquiryId) => {
-  return supabase
-    .from('listing_inquiries')
-    .update({ status: 'read' })
-    .eq('id', inquiryId);
+  try {
+    const { data, error } = await supabase
+      .from('listing_inquiries')
+      .update({ status: 'read' })
+      .eq('id', inquiryId);
+    return { data, error };
+  } catch (error) {
+    return { error };
+  }
+};
+
+export const deleteInquiry = async (inquiryId) => {
+  try {
+    const { data, error } = await supabase
+      .from('listing_inquiries')
+      .delete()
+      .eq('id', inquiryId);
+    return { data, error };
+  } catch (error) {
+    return { error };
+  }
 };
