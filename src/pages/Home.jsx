@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 import GoldPriceTracker from "../components/GoldPriceTracker";
 import GoldParticles from "../components/GoldParticles";
 import WavyDivider from "../components/WavyDivider";
+import { getPopularListings } from "../services/listings-service";
 import "../styles/kenburns.css";
 
 function Home() {
@@ -24,6 +25,8 @@ function Home() {
   const homeRef = useRef(null);
   const logoRef = useRef(null);
   const [currentImage, setCurrentImage] = useState(0);
+  const [popularListings, setPopularListings] = useState([]);
+  const [popularListingsLoading, setPopularListingsLoading] = useState(true);
   const images = [
     { src: "/images/hero-bg.jpg", position: "center 20%" },
     { src: "/images/hero-bg2.jpg", position: "center 40%" },
@@ -35,7 +38,7 @@ function Home() {
     }, 8000); // Change image every 8 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [images.length]);
 
   useEffect(() => {
     if (homeRef.current) {
@@ -140,6 +143,24 @@ function Home() {
     `;
     document.head.appendChild(style);
     return () => style.remove();
+  }, []);
+
+  // Fetch popular listings
+  useEffect(() => {
+    const fetchPopularListings = async () => {
+      setPopularListingsLoading(true);
+      try {
+        const { data, error } = await getPopularListings(3);
+        if (error) throw error;
+        setPopularListings(data || []);
+      } catch (err) {
+        console.error("Error fetching popular listings:", err);
+      } finally {
+        setPopularListingsLoading(false);
+      }
+    };
+
+    fetchPopularListings();
   }, []);
 
   // Show a simple UI if there's an error
@@ -278,6 +299,93 @@ function Home() {
                 <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
               </svg>
             </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Popular Listings Section */}
+      <div className={darkMode ? "bg-dark-surface py-16" : "bg-white py-16"}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2
+              className={`text-3xl font-extrabold ${
+                darkMode ? "text-gold" : "text-gray-900"
+              } sm:text-4xl`}
+            >
+              Featured Items
+            </h2>
+            <p
+              className={`mt-4 max-w-2xl text-xl ${
+                darkMode ? "text-gray-200" : "text-gray-500"
+              } mx-auto`}
+            >
+              Check out our featured gold collection
+            </p>
+          </div>
+
+          {popularListingsLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${darkMode ? 'border-amber-400' : 'border-amber-600'}`}></div>
+            </div>
+          ) : popularListings.length > 0 ? (
+            <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {popularListings.map((listing) => (
+                <Link
+                  key={listing.id}
+                  to={`/listing/${listing.id}`}
+                  className={`group ${darkMode ? "bg-dark-surface-2 hover:bg-dark-surface-3" : "bg-white hover:bg-gray-50"} overflow-hidden rounded-lg shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl`}
+                >
+                  <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 relative h-64">
+                    {/* Crown icon for most liked */}
+                    <div className="absolute top-3 right-3 z-10">
+                      <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${darkMode ? "bg-amber-400 text-black" : "bg-amber-600 text-white"}`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-xs font-medium">{listing.likeCount} likes</span>
+                      </div>
+                    </div>
+                    <img
+                      src={listing.image_url}
+                      alt={listing.title}
+                      className="h-full w-full object-cover object-center group-hover:opacity-75"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className={`text-lg font-medium ${darkMode ? "text-white" : "text-gray-900"}`}>
+                      {listing.title}
+                    </h3>
+                    <div className="mt-1 flex justify-between items-center">
+                      <p className={`text-lg font-bold ${darkMode ? "text-amber-400" : "text-amber-600"}`}>
+                        ₱{listing.price?.toLocaleString()}
+                      </p>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${darkMode ? "bg-gray-700 text-gray-200" : "bg-gray-100 text-gray-800"}`}>
+                        {listing.category}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className={`text-center py-16 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+              <p>No popular listings available at the moment.</p>
+              <Link to="/listings" className="mt-4 inline-block btn-primary text-sm hover:scale-105 transition-transform">
+                Browse all listings
+              </Link>
+            </div>
+          )}
+
+          <div className="mt-10 text-center">
+            <Link
+              to="/listings"
+              className="btn-primary inline-flex items-center hover:scale-105 transition-transform"
+            >
+              View All Listings
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
+            </Link>
           </div>
         </div>
       </div>

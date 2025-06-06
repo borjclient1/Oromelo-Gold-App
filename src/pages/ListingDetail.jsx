@@ -49,6 +49,7 @@ const ListingDetail = () => {
   const [inquiryLoading, setInquiryLoading] = useState(false);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // Fetch listing details
   useEffect(() => {
@@ -277,7 +278,8 @@ const ListingDetail = () => {
                       : listing.additional_images?.[activeImageIndex - 1]
                   }
                   alt={listing.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() => setIsLightboxOpen(true)}
                 />
               </div>
 
@@ -443,6 +445,60 @@ const ListingDetail = () => {
               </div>
             </div>
           </div>
+
+          {/* Lightbox */}
+          {isLightboxOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90" onClick={() => setIsLightboxOpen(false)}>
+              <div className="relative max-w-5xl max-h-[90vh] p-4">
+                <button
+                  className="absolute top-2 right-2 p-2 text-white bg-black bg-opacity-50 rounded-full hover:bg-opacity-70"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsLightboxOpen(false);
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+                <img
+                  src={
+                    activeImageIndex === 0
+                      ? listing.image_url
+                      : listing.additional_images?.[activeImageIndex - 1]
+                  }
+                  alt={listing.title}
+                  className="max-h-[85vh] max-w-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                />
+                
+                {/* Navigation controls */}
+                {(listing.additional_images?.length > 0 || activeImageIndex > 0) && (
+                  <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-2 p-2">
+                    <div
+                      className={`w-3 h-3 rounded-full cursor-pointer ${activeImageIndex === 0 ? "bg-amber-600" : "bg-gray-400"}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveImageIndex(0);
+                      }}
+                    ></div>
+                    
+                    {listing.additional_images?.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-3 h-3 rounded-full cursor-pointer ${activeImageIndex === index + 1 ? "bg-amber-600" : "bg-gray-400"}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveImageIndex(index + 1);
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Comments Section */}
           <div className={`p-6 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>

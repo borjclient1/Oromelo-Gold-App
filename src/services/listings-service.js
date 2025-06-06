@@ -196,6 +196,63 @@ export const toggleLike = async (listingId, userId) => {
   }
 };
 
+// Popular Listings
+export const getPopularListings = async (limit = 3) => {
+  try {
+    // First, get all active listings
+    const { data: listings, error } = await supabase
+      .from('listings')
+      .select('*')
+      .eq('status', 'active');
+      
+    if (error) throw error;
+    if (!listings || listings.length === 0) return { data: [] };
+    
+    // Get all likes for these listings
+    const listingIds = listings.map(listing => listing.id);
+    const { data: likes, error: likesError } = await supabase
+      .from('listing_likes')
+      .select('listing_id')
+      .in('listing_id', listingIds);
+      
+    if (likesError) throw likesError;
+    
+    // Count likes for each listing
+    const likeCounts = likes.reduce((acc, { listing_id }) => {
+      acc[listing_id] = (acc[listing_id] || 0) + 1;
+      return acc;
+    }, {});
+    
+    // Add like count to each listing
+    const listingsWithLikes = listings.map(listing => ({
+      ...listing,
+      likeCount: likeCounts[listing.id] || 0
+    }));
+    
+    // Sort by like count (descending)
+    listingsWithLikes.sort((a, b) => b.likeCount - a.likeCount);
+    
+    // Check if all listings have the same number of likes
+    const allSameLikes = listingsWithLikes.length > 1 && 
+      listingsWithLikes.every(listing => listing.likeCount === listingsWithLikes[0].likeCount);
+    
+    // If all have same likes, shuffle and take limit
+    if (allSameLikes) {
+      // Fisher-Yates shuffle algorithm
+      for (let i = listingsWithLikes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [listingsWithLikes[i], listingsWithLikes[j]] = [listingsWithLikes[j], listingsWithLikes[i]];
+      }
+    }
+    
+    // Return the top listings (limited)
+    return { data: listingsWithLikes.slice(0, limit) };
+  } catch (error) {
+    console.error('Error fetching popular listings:', error);
+    return { error };
+  }
+};
+
 // Comments
 export const getCommentsForListing = async (listingId) => {
   return supabase

@@ -15,7 +15,10 @@ const Listings = () => {
   // Scroll to top when the component mounts
   React.useEffect(() => {
     if (listingsRef.current) {
-      listingsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      listingsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, []);
   const [filters, setFilters] = useState({
@@ -147,7 +150,9 @@ const Listings = () => {
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="px-4 py-6 sm:px-0">
-          <h1 className={`text-3xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
+          <h1
+            className={`text-3xl font-bold ${darkMode ? "text-white" : "text-gray-900"}`}
+          >
             Gold Listings
           </h1>
           <p className={`mt-1 ${darkMode ? "text-gray-300" : "text-gray-500"}`}>
@@ -161,10 +166,11 @@ const Listings = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2 rounded text-sm flex items-center ${darkMode
-                  ? "bg-gray-700 hover:bg-gray-600 text-white"
-                  : "bg-white hover:bg-gray-100 text-gray-800 border border-gray-300"
-                  }`}
+                className={`px-4 py-2 rounded text-sm flex items-center ${
+                  darkMode
+                    ? "bg-gray-700 hover:bg-gray-600 text-white"
+                    : "bg-white hover:bg-gray-100 text-gray-800 border border-gray-300"
+                }`}
               >
                 <svg
                   className="w-4 h-4 mr-2"
@@ -184,14 +190,17 @@ const Listings = () => {
               </button>
             </div>
 
-            <div className={`w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 ${showFilters ? "mb-4" : ""}`}>
+            <div
+              className={`w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 ${showFilters ? "mb-4" : ""}`}
+            >
               <select
                 value={sortBy}
                 onChange={handleSortChange}
-                className={`px-3 py-2 rounded text-sm ${darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
-                  : "bg-white text-gray-800 border-gray-300"
-                  } border`}
+                className={`px-3 py-2 rounded text-sm ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600"
+                    : "bg-white text-gray-800 border-gray-300"
+                } border`}
               >
                 <option value="created_at">Date Added</option>
                 <option value="price">Price</option>
@@ -202,10 +211,11 @@ const Listings = () => {
               <select
                 value={sortOrder}
                 onChange={handleSortOrderChange}
-                className={`px-3 py-2 rounded text-sm ${darkMode
-                  ? "bg-gray-700 text-white border-gray-600"
-                  : "bg-white text-gray-800 border-gray-300"
-                  } border`}
+                className={`px-3 py-2 rounded text-sm ${
+                  darkMode
+                    ? "bg-gray-700 text-white border-gray-600"
+                    : "bg-white text-gray-800 border-gray-300"
+                } border`}
               >
                 <option value="desc">Descending</option>
                 <option value="asc">Ascending</option>
