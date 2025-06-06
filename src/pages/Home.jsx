@@ -27,6 +27,7 @@ function Home() {
   const [currentImage, setCurrentImage] = useState(0);
   const [popularListings, setPopularListings] = useState([]);
   const [popularListingsLoading, setPopularListingsLoading] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const images = [
     { src: "/images/hero-bg.jpg", position: "center 20%" },
     { src: "/images/hero-bg2.jpg", position: "center 40%" },
@@ -144,6 +145,29 @@ function Home() {
     document.head.appendChild(style);
     return () => style.remove();
   }, []);
+
+  // Add scroll to top button visibility control
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show button when user scrolls down 500px from the top
+      if (window.scrollY > 500) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Function to scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   // Fetch popular listings
   useEffect(() => {
@@ -866,6 +890,35 @@ function Home() {
           </div>
         </div>
       </div>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className={`fixed right-6 bottom-6 p-3 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 z-50 bg-gold hover:bg-yellow-400 text-gray-900`}
+          style={{
+            boxShadow: darkMode
+              ? "0 2px 8px rgba(255, 215, 0, 0.3)"
+              : "0 2px 4px rgba(255, 215, 0, 0.2)",
+          }}
+          aria-label="Scroll to top"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 10l7-7m0 0l7 7m-7-7v18"
+            ></path>
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
