@@ -1,6 +1,6 @@
 # Oromelo Gold Pawn
 
-A modern full-stack web application for managing gold transactions, built with React, Tailwind CSS, and Supabase. The platform allows users to sell or pawn their gold items with secure authentication, while admin capabilities provide comprehensive transaction management, real-time monitoring, and user profile management. It also features a user-friendly, interactive interface with dark mode support.
+A modern full-stack web application for managing gold transactions, built with React, Tailwind CSS, and Supabase. The platform allows users to buy, sell or pawn their gold items with secure authentication, while admin capabilities provide comprehensive transaction management, real-time monitoring, and user profile management. It also features a user-friendly, interactive interface with dark mode support.
 
 https://oromelo.ph
 
@@ -43,6 +43,9 @@ https://oromelo.ph
 - User management
 - Advanced filtering and sorting
 - Multiple admin email notifications
+- **Listings Management**: Admin dashboard for managing all listings
+- **Inquiry Management**: View and respond to user inquiries about listings
+- **Featured Control**: Monitor popular items that appear in the Featured section
 
 ### Core Features
 
@@ -56,6 +59,15 @@ https://oromelo.ph
 - Status badges for item states
 - Pagination for item listings
 - Mobile-responsive design
+
+### Gold Listings Feature
+
+- **Listings Browse Page**: View all available gold items with advanced filtering options
+- **Interactive Listing Detail**: Individual listing pages with detailed information
+- **Lightbox Gallery**: Full-screen image viewer with navigation controls on listing detail pages
+- **Featured Items Section**: Homepage showcase of 3 most popular items based on like counts
+- **Social Features**: Like and comment on listings to increase engagement
+- **User Inquiries**: Send direct inquiries about specific listings to sellers
 
 ### Technical Features
 
@@ -88,12 +100,10 @@ https://oromelo.ph
 
 - **Frontend**:
   - React 18.2.0
-  - React Router DOM 6.22.1
-  - Tailwind CSS 3.4.1 for styling
-  - Heroicons 2.1.1 for UI elements
-  - React Hook Form for form handling
-  - Framer Motion for animations
-  - React Particles for interactive backgrounds
+  - React Router DOM 6.22.0
+  - Tailwind CSS 3.3.3 for styling
+  - Heroicons 2.2.0 for UI icons
+  - React tsParticles 2.12.2 for interactive backgrounds
 - **Backend**:
   - Supabase for Authentication, Database, and Storage
   - PostgreSQL database (managed by Supabase)
@@ -202,6 +212,66 @@ Records all transactions (sales and pawns).
 | transaction_type | TEXT      | Type of transaction ('sell' or 'pawn')   | NOT NULL      |
 | created_at       | TIMESTAMP | Creation timestamp                       | DEFAULT now() |
 | updated_at       | TIMESTAMP | Last update timestamp                    | DEFAULT now() |
+
+### 6. Listings Table
+
+Stores the gold item listings for the marketplace.
+
+| Column Name | Data Type | Description               | Constraints      |
+| ----------- | --------- | ------------------------- | ---------------- |
+| id          | UUID      | Unique listing ID         | PRIMARY KEY      |
+| user_id     | UUID      | Owner of the listing      | NOT NULL         |
+| title       | TEXT      | Listing title             | NOT NULL         |
+| description | TEXT      | Detailed description      |                  |
+| price       | DECIMAL   | Item price                | NOT NULL         |
+| category    | TEXT      | Item category             | NOT NULL         |
+| purity      | TEXT      | Gold purity (karat)       |                  |
+| weight      | DECIMAL   | Weight in grams           |                  |
+| gold_color  | TEXT      | Color of gold             |                  |
+| gold_origin | TEXT      | Origin of gold            |                  |
+| images      | TEXT[]    | Array of image URLs       |                  |
+| status      | TEXT      | Current status of listing | DEFAULT 'active' |
+| created_at  | TIMESTAMP | Creation timestamp        | DEFAULT now()    |
+| updated_at  | TIMESTAMP | Last update timestamp     | DEFAULT now()    |
+
+### 7. Listing Likes Table
+
+Tracking likes on listings to determine popularity.
+
+| Column Name | Data Type | Description                                  | Constraints   |
+| ----------- | --------- | -------------------------------------------- | ------------- |
+| id          | UUID      | Unique like ID                               | PRIMARY KEY   |
+| user_id     | UUID      | User who liked the listing                   | NOT NULL      |
+| listing_id  | UUID      | ID of liked listing (references listings.id) | NOT NULL      |
+| created_at  | TIMESTAMP | Creation timestamp                           | DEFAULT now() |
+
+### 8. Listing Comments Table
+
+Stores user comments on listings.
+
+| Column Name | Data Type | Description                                      | Constraints   |
+| ----------- | --------- | ------------------------------------------------ | ------------- |
+| id          | UUID      | Unique comment ID                                | PRIMARY KEY   |
+| user_id     | UUID      | User who made the comment                        | NOT NULL      |
+| listing_id  | UUID      | ID of commented listing (references listings.id) | NOT NULL      |
+| comment     | TEXT      | Comment text                                     | NOT NULL      |
+| created_at  | TIMESTAMP | Creation timestamp                               | DEFAULT now() |
+| updated_at  | TIMESTAMP | Last update timestamp                            | DEFAULT now() |
+
+### 9. Listing Inquiries Table
+
+Stores user inquiries about specific listings.
+
+| Column Name    | Data Type | Description                                     | Constraints   |
+| -------------- | --------- | ----------------------------------------------- | ------------- |
+| id             | UUID      | Unique inquiry ID                               | PRIMARY KEY   |
+| user_id        | UUID      | User who made the inquiry                       | NOT NULL      |
+| listing_id     | UUID      | ID of inquired listing (references listings.id) | NOT NULL      |
+| message        | TEXT      | Inquiry message                                 | NOT NULL      |
+| contact_number | TEXT      | Contact number of inquirer                      |               |
+| status         | TEXT      | Status of inquiry (new, read, responded)        | DEFAULT 'new' |
+| created_at     | TIMESTAMP | Creation timestamp                              | DEFAULT now() |
+| updated_at     | TIMESTAMP | Last update timestamp                           | DEFAULT now() |
 
 ## Configuration
 
@@ -350,6 +420,179 @@ USING (bucket_id = 'gold-items-images' AND (owner = auth.uid() OR auth.email() =
 CREATE POLICY "Users can delete their own files"
 ON storage.objects FOR DELETE
 USING (bucket_id = 'gold-items-images' AND (owner = auth.uid() OR auth.email() = 'shredraldz@gmail.com'));
+```
+
+## Additional Database Tables Setup
+
+Create the additional marketplace-related tables:
+
+```sql
+-- Listings Table
+CREATE TABLE listings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  price DECIMAL NOT NULL,
+  category TEXT NOT NULL,
+  purity TEXT,
+  weight DECIMAL,
+  gold_color TEXT,
+  gold_origin TEXT,
+  images TEXT[],
+  status TEXT DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT now(),
+  updated_at TIMESTAMP DEFAULT now()
+);
+
+-- Listing Likes Table
+CREATE TABLE listing_likes (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  listing_id UUID REFERENCES listings(id) NOT NULL,
+  created_at TIMESTAMP DEFAULT now(),
+  UNIQUE(user_id, listing_id)
+);
+
+-- Listing Comments Table
+CREATE TABLE listing_comments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  listing_id UUID REFERENCES listings(id) NOT NULL,
+  comment TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT now(),
+  updated_at TIMESTAMP DEFAULT now()
+);
+
+-- Listing Inquiries Table
+CREATE TABLE listing_inquiries (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  listing_id UUID REFERENCES listings(id) NOT NULL,
+  message TEXT NOT NULL,
+  contact_number TEXT,
+  status TEXT DEFAULT 'new',
+  created_at TIMESTAMP DEFAULT now(),
+  updated_at TIMESTAMP DEFAULT now()
+);
+```
+
+## Additional Row Level Security (RLS)
+
+Enable Row Level Security on new tables:
+
+```sql
+-- Enable RLS on new tables
+ALTER TABLE "listings" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "listing_likes" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "listing_comments" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "listing_inquiries" ENABLE ROW LEVEL SECURITY;
+
+-- LISTINGS POLICIES
+CREATE POLICY "Anyone can view active listings" ON "listings"
+  FOR SELECT USING (status = 'active');
+
+CREATE POLICY "Users can view own inactive listings" ON "listings"
+  FOR SELECT USING (auth.uid() = user_id AND status != 'active');
+
+CREATE POLICY "Admin can view all listings" ON "listings"
+  FOR SELECT USING (auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com'));
+
+CREATE POLICY "Users can insert own listings" ON "listings"
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own listings" ON "listings"
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Admin can update any listing" ON "listings"
+  FOR UPDATE USING (auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com'));
+
+CREATE POLICY "Users can delete own listings" ON "listings"
+  FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "Admin can delete any listing" ON "listings"
+  FOR DELETE USING (auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com'));
+
+-- LISTING LIKES POLICIES
+CREATE POLICY "Anyone can view listing likes" ON "listing_likes"
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users can insert own likes" ON "listing_likes"
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own likes" ON "listing_likes"
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- LISTING COMMENTS POLICIES
+CREATE POLICY "Anyone can view comments" ON "listing_comments"
+  FOR SELECT USING (true);
+
+CREATE POLICY "Authenticated users can comment" ON "listing_comments"
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own comments" ON "listing_comments"
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own comments" ON "listing_comments"
+  FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "Admin can delete any comment" ON "listing_comments"
+  FOR DELETE USING (auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com'));
+
+-- LISTING INQUIRIES POLICIES
+CREATE POLICY "Users can view own inquiries" ON "listing_inquiries"
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Listing owner can view inquiries for their listings" ON "listing_inquiries"
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM listings
+      WHERE listings.id = listing_id
+      AND listings.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Admin can view all inquiries" ON "listing_inquiries"
+  FOR SELECT USING (auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com'));
+
+CREATE POLICY "Authenticated users can create inquiries" ON "listing_inquiries"
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Admin can update inquiries" ON "listing_inquiries"
+  FOR UPDATE USING (auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com'));
+
+CREATE POLICY "Users can delete own inquiries" ON "listing_inquiries"
+  FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "Admin can delete any inquiry" ON "listing_inquiries"
+  FOR DELETE USING (auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com'));
+```
+
+## Storage Bucket Configuration
+
+Add configuration for listing images storage:
+
+```sql
+-- Create additional storage bucket for listing images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('listing-images', 'listing-images', TRUE);
+
+-- Set up access policies
+CREATE POLICY "Public Access to Listing Images"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'listing-images');
+
+CREATE POLICY "Authenticated users can upload listing images"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'listing-images' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Users can update their own listing images"
+ON storage.objects FOR UPDATE
+USING (bucket_id = 'listing-images' AND (owner = auth.uid() OR auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com')));
+
+CREATE POLICY "Users can delete their own listing images"
+ON storage.objects FOR DELETE
+USING (bucket_id = 'listing-images' AND (owner = auth.uid() OR auth.email() IN ('shredraldz@gmail.com', 'admin@oromelo.ph', 'ermpolicarpio@gmail.com', 'raldz18@yahoo.com')));
 ```
 
 ### 5. Configure Authentication
@@ -537,7 +780,8 @@ oromelo-gold-pawn/
 │   │   ├── AuthContext.jsx     # Authentication context
 │   │   ├── AuthProvider.jsx    # Auth context provider
 │   │   ├── ThemeContext.js     # Theme context
-│   │   └── ThemeProvider.jsx   # Theme context provider
+│   │   ├── ThemeProvider.jsx   # Theme context provider
+│   │   └── useAuth.js          # Authentication hook
 │   │
 │   ├── data/                # Static data
 │   │   └── faqData.js          # FAQ content
@@ -552,6 +796,8 @@ oromelo-gold-pawn/
 │   ├── pages/               # Application pages
 │   │   ├── admin/             # Admin pages
 │   │   │   └── AdminDashboard.jsx # Admin dashboard
+│   │   │   └── ManageListings.jsx # Manage listings page
+│   │   │   └── ListingInquiries.jsx # Listing inquiries page
 │   │   │
 │   │   ├── user/              # User pages
 │   │   │   └── MyItems.jsx      # User's items page
@@ -561,6 +807,8 @@ oromelo-gold-pawn/
 │   │   ├── FAQ.jsx             # FAQ page
 │   │   ├── ForgotPassword.jsx  # Password reset request
 │   │   ├── Home.jsx            # Homepage
+│   │   ├── Listings.jsx        # Browse listings page
+│   │   ├── ListingDetail.jsx   # Individual listing detail
 │   │   ├── NotFound.jsx        # 404 page
 │   │   ├── PawnForm.jsx        # Pawn submission form
 │   │   ├── Privacy.jsx         # Privacy policy
@@ -659,30 +907,32 @@ oromelo-gold-pawn/
    npm run dev
    ```
 
-5. Open your browser and navigate to `http://localhost:5173`
-
 ## Application Routes
 
 Below is a complete list of all routes in the application, along with their access levels and purposes:
 
-| Route              | Component      | Type      | Access              | Description                                         |
-| ------------------ | -------------- | --------- | ------------------- | --------------------------------------------------- |
-| `/`                | Home           | Public    | Everyone            | Landing page with featured items and call-to-action |
-| `/signin`          | SignIn         | Public    | Guests only         | User authentication page                            |
-| `/signup`          | SignUp         | Public    | Guests only         | User registration page                              |
-| `/forgot-password` | ForgotPassword | Public    | Guests only         | Password recovery page                              |
-| `/update-password` | UpdatePassword | Public    | Authenticated users | Password reset page                                 |
-| `/about`           | About          | Public    | Everyone            | Information about Oromelo Gold Pawn                 |
-| `/contact`         | Contact        | Public    | Everyone            | Contact form page                                   |
-| `/terms`           | Terms          | Public    | Everyone            | Terms of service                                    |
-| `/privacy`         | Privacy        | Public    | Everyone            | Privacy policy                                      |
-| `/faq`             | FAQ            | Public    | Everyone            | Frequently asked questions                          |
-| `/admin`           | AdminDashboard | Protected | Admin only          | Administrative dashboard                            |
-| `/sell-item`       | SellForm       | Protected | Authenticated users | Form to list an item for sale                       |
-| `/pawn-item`       | PawnForm       | Protected | Authenticated users | Form to request a pawn transaction                  |
-| `/my-items`        | MyItems        | Protected | Authenticated users | User's listed items                                 |
-| `/profile`         | Profile        | Protected | Authenticated users | User profile management                             |
-| `*`                | NotFound       | Public    | Everyone            | 404 Not Found page                                  |
+| Route              | Component        | Type      | Access              | Description                                         |
+| ------------------ | ---------------- | --------- | ------------------- | --------------------------------------------------- |
+| `/`                | Home             | Public    | Everyone            | Landing page with featured items and call-to-action |
+| `/signin`          | SignIn           | Public    | Guests only         | User authentication page                            |
+| `/signup`          | SignUp           | Public    | Guests only         | User registration page                              |
+| `/forgot-password` | ForgotPassword   | Public    | Guests only         | Password recovery page                              |
+| `/update-password` | UpdatePassword   | Public    | Authenticated users | Password reset page                                 |
+| `/about`           | About            | Public    | Everyone            | Information about Oromelo Gold Pawn                 |
+| `/contact`         | Contact          | Public    | Everyone            | Contact form page                                   |
+| `/terms`           | Terms            | Public    | Everyone            | Terms of service                                    |
+| `/privacy`         | Privacy          | Public    | Everyone            | Privacy policy                                      |
+| `/faq`             | FAQ              | Public    | Everyone            | Frequently asked questions                          |
+| `/admin`           | AdminDashboard   | Protected | Admin only          | Administrative dashboard                            |
+| `/sell-item`       | SellForm         | Protected | Authenticated users | Form to list an item for sale                       |
+| `/pawn-item`       | PawnForm         | Protected | Authenticated users | Form to request a pawn transaction                  |
+| `/my-items`        | MyItems          | Protected | Authenticated users | User's listed items                                 |
+| `/profile`         | Profile          | Protected | Authenticated users | User profile management                             |
+| `/listings`        | Listings         | Public    | Everyone            | Browse all active gold listings                     |
+| `/listing/:id`     | ListingDetail    | Public    | Everyone            | View detailed information about a specific listing  |
+| `/admin/manage`    | ManageListings   | Protected | Admin only          | Manage all listings                                 |
+| `/admin/inquiries` | ListingInquiries | Protected | Admin only          | View detailed information about a specific inquiry  |
+| `*`                | NotFound         | Public    | Everyone            | 404 Not Found page                                  |
 
 ### Route Types:
 

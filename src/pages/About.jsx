@@ -308,6 +308,27 @@ function About() {
               exceeding your expectations.
             </p>
 
+            <div className="my-12 flex flex-col items-center">
+              <img
+                src="/images/oromelo-cert.jpg"
+                alt="Oromelo Gold Certification"
+                className="rounded-lg shadow-lg max-w-full md:max-w-2xl mx-auto"
+              />
+              <div
+                className={`mt-6 px-8 py-6 ${darkMode ? "bg-dark-surface-2" : "bg-gray-50"} rounded-lg max-w-2xl mx-auto border-l-4 ${darkMode ? "border-gold-400" : "border-gold"}`}
+              >
+                <h3
+                  className={`text-xl font-semibold mb-3 ${darkMode ? "text-gold" : "text-gold"}`}
+                >
+                  Learning Fuels Our Excellence
+                </h3>
+                <p className="text-lg">
+                  At Oromelo, we believe in continuous growth. Our team actively
+                  seeks professional development to serve you better.
+                </p>
+              </div>
+            </div>
+
             <div
               className={`${
                 darkMode ? "bg-gold bg-opacity-10" : "bg-gold bg-opacity-10"
